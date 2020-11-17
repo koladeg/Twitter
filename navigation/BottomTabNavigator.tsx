@@ -1,13 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
+import ProfilePicture from '../components/ProfilePicture';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import TabOneScreen from '../screens/TabOneScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
-import { BottomTabParamList, TabOneParamList, TabTwoParamList } from '../types';
+import { BottomTabParamList, HomeNavigatorList, TabTwoParamList } from '../types';
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -23,7 +24,7 @@ export default function BottomTabNavigator() {
         }}>
       <BottomTab.Screen
         name="Home"
-        component={TabOneNavigator}
+        component={HomeNavigator}
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="md-home" color={color} />,
         }}
@@ -61,15 +62,31 @@ function TabBarIcon(props: { name: string; color: string }) {
 
 // Each tab has its own navigation stack, you can read more about this pattern here:
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
-const TabOneStack = createStackNavigator<TabOneParamList>();
+const TabOneStack = createStackNavigator<HomeNavigatorList>();
 
-function TabOneNavigator() {
+function HomeNavigator() {
   return (
     <TabOneStack.Navigator>
       <TabOneStack.Screen
-        name="TabOneScreen"
+        name="HomeScreen"
         component={TabOneScreen}
-        options={{ headerTitle: 'Tab One Title' }}
+        options={{ 
+          headerRightContainerStyle : {
+            marginRight: 15,
+          },
+          headerLeftContainerStyle : {
+            marginLeft: 15,
+          },
+          headerTitle: () => (
+            <Ionicons name={"logo-twitter"} color={Colors.light.tint} size={30} />
+          ),
+          headerRight: () => (
+            <MaterialCommunityIcons name={"star-four-points-outline"} color={Colors.light.tint} size={30} />
+          ),
+          headerLeft: () => (
+            <ProfilePicture image={"https://avatars2.githubusercontent.com/u/6222649?s=460&u=7942910c72081e13801479073e4ae8d243338953&v=4"}  size={40} />
+          ),
+        }}
       />
     </TabOneStack.Navigator>
   );
