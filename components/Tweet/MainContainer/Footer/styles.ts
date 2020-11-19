@@ -5,6 +5,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginHorizontal: 10,  
+        marginTop: 5, 
     },
     number: {
         marginLeft: 5,

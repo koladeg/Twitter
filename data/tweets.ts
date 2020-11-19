@@ -9,7 +9,7 @@ export const tweets = [
         },
         createdAt: '2020-11-18T12:00:00.00Z',
         content: 'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
-        image: '',
+        image: 'https://assets.paystack.com/assets/img/content/Collect-Payments-for-Multiple-Channels-1.1.gif',
         numberOfComment: 123,
         numberOfRetweets: 11,
         numberOfLikes: 10,
