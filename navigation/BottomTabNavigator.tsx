@@ -2,13 +2,17 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
-import ProfilePicture from '../components/ProfilePicture';
+import { API, graphqlOperation, Auth } from "aws-amplify";
+
+
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import HomeScreen from '../screens/HomeScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
 import { BottomTabParamList, HomeNavigatorList, TabTwoParamList } from '../types';
+import ProfilePicture from '../components/ProfilePicture';
+import { getUser } from "../graphql/queries";
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -65,6 +69,30 @@ function TabBarIcon(props: { name: string; color: string }) {
 const TabOneStack = createStackNavigator<HomeNavigatorList>();
 
 function HomeNavigator() {
+
+  const [user, setUser] = React.useState(null);
+
+  React.useEffect(() => {
+    
+    // get current user
+    const fetchUser = async () => {
+      const userInfo = await Auth.currentAuthenticatedUser({ bypassCache: true})
+      if (!userInfo){
+        return;
+      }
+
+      try {
+        const userData = await API.graphql(graphqlOperation(getUser, { id: userInfo.attributes.sub }))
+        if(userData){
+          setUser(userData.data.getUser);
+        }
+      } catch (error) {
+        console.log(error);
+        
+      }
+    }
+    fetchUser();
+  }, [])
   return (
     <TabOneStack.Navigator>
       <TabOneStack.Screen
@@ -84,7 +112,7 @@ function HomeNavigator() {
             <MaterialCommunityIcons name={"star-four-points-outline"} color={Colors.light.tint} size={30} />
           ),
           headerLeft: () => (
-            <ProfilePicture image={"https://avatars2.githubusercontent.com/u/6222649?s=460&u=7942910c72081e13801479073e4ae8d243338953&v=4"}  size={40} />
+            <ProfilePicture image={ user?.image}  size={40} />
           ),
         }}
       />
