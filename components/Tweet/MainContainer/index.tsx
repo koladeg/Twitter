@@ -14,7 +14,7 @@ const MainContainer = ({ tweet }: MainContainerProps) => (
     <View style={styles.container}>
         <View style={styles.tweetHeaderContainer}>
             <View style={styles.tweetHeaderNames}>
-                    <Text style={styles.name}>{tweet.user.name}</Text>
+                    <Text style={styles.name}>{tweet.user.username}</Text>
                     <Text style={styles.username}>@{tweet.user.username}</Text>
                     <Text style={styles.createdAt}>{moment(tweet.createdAt).fromNow()}</Text>
             </View>           

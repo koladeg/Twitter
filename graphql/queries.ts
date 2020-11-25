@@ -71,8 +71,16 @@ export const listTweets = /* GraphQL */ `
         content
         image
         userID
+        user {
+          id
+          username
+          name
+          email
+          image
+          createdAt
+          updatedAt
+        }
         createdAt
-        updatedAt
       }
       nextToken
     }

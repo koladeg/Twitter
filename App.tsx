@@ -35,7 +35,7 @@ function App() {
       if (userInfo) {
 
         const userData = await API.graphql(graphqlOperation ( getUser, { id: userInfo.attributes.sub}))
-        console.log(userData);
+        // console.log(userData);
         if (!userData.data.getUser) {
           const  user = {
             id: userInfo.attributes.sub,
