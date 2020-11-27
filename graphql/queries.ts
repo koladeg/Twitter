@@ -54,6 +54,9 @@ export const getTweet = /* GraphQL */ `
         createdAt
         updatedAt
       }
+      likes {
+        nextToken
+      }
       createdAt
       updatedAt
     }
@@ -86,3 +89,4 @@ export const listTweets = /* GraphQL */ `
     }
   }
 `;
+
