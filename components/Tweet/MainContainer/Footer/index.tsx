@@ -2,12 +2,11 @@ import { AntDesign, EvilIcons, Feather } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react'
 import { View, Text, TouchableOpacity } from "react-native";
 
-
 import { API, graphqlOperation, Auth } from "aws-amplify";
 
 import { TweetType } from '../../../../types';
 import styles from './styles';
-import { CreateLike } from '../../../../graphql/mutations';
+import { createLike } from '../../../../graphql/mutations';
 
 export type FooterContainerProps = {
     tweet: TweetType,
@@ -16,11 +15,18 @@ export type FooterContainerProps = {
 const Footer = ({ tweet }: FooterContainerProps) => {
 
     const [user, setUser] = useState(null)
+    const [myLike, setMyLike] = useState(null)
+    const [likesCount, setLikesCount] = useState(tweet.likes.items.length)
 
     useEffect(() => {
         const fetchUser = async () => {
-            const user = await Auth.currentAuthenticatedUser();
-            setUser(user);
+            const currentUser = await Auth.currentAuthenticatedUser();
+            setUser(currentUser);
+
+            const searchedLike = tweet.likes.items.find(
+                (like) => like.userID === currentUser.attributes.sub
+                );
+                setMyLike(searchedLike);
         }
         fetchUser();
     }, [])
@@ -36,7 +42,9 @@ const Footer = ({ tweet }: FooterContainerProps) => {
         }
 
        try {     
-           await API.graphql(graphqlOperation(CreateLike, { input: like}))
+           const res = await API.graphql(graphqlOperation(createLike, { input: like}))
+           setMyLike(res.data.createLike)
+           setLikesCount(likesCount + 1)
        } catch (e) {
            console.log(e);
            
@@ -55,9 +63,9 @@ const Footer = ({ tweet }: FooterContainerProps) => {
         </View>
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={onLike}>
-                <AntDesign name={"hearto"} size={20} color={'grey'} />
+                <AntDesign name={!myLike ? "hearto" : "heart"} size={20} color={!myLike ? 'grey': 'red'} />
             </TouchableOpacity>
-            <Text style={styles.number}>{tweet.numberOfLikes}</Text>
+            <Text style={styles.number}>{likesCount}</Text>
         </View>
         <View style={styles.iconContainer}>
             <EvilIcons name={"share-google"} size={28} color={'grey'} />

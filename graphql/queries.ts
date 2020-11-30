@@ -55,6 +55,12 @@ export const getTweet = /* GraphQL */ `
         updatedAt
       }
       likes {
+        items {
+          id
+          userID
+          tweetID
+          createdAt 
+        }
         nextToken
       }
       createdAt
@@ -82,6 +88,15 @@ export const listTweets = /* GraphQL */ `
           image
           createdAt
           updatedAt
+        }
+        likes {
+          items {
+            id
+            userID
+            tweetID
+            createdAt 
+          }
+          nextToken
         }
         createdAt
       }
