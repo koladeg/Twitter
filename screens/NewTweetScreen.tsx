@@ -1,8 +1,8 @@
 import { AntDesign } from '@expo/vector-icons';
-import * as React from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput } from 'react-native';
-import { API, graphqlOperation, Auth } from "aws-amplify";
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import React, { useEffect } from 'react';
+import { Image, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { API, graphqlOperation, Auth, Storage } from "aws-amplify";
+import * as ImagePicker from 'expo-image-picker';
 import ProfilePicture from '../components/ProfilePicture';
 import { View } from '../components/Themed';
 import Colors from '../constants/Colors';
@@ -16,8 +16,52 @@ export default function NewTweetScreen() {
   const[imageUrl,  setImageUrl] = React.useState("");
 
   const navigation = useNavigation();
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Sorry, we need camera roll permissions to make this work!');
+        }
+      }
+    })();
+  }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImageUrl(result.uri);
+    }
+  };
+
+  const uploadImage = async () => {
+    try {
+      const res = await fetch(imageUrl)
+
+      const blob = await res.blob()
+
+      const urlParts = imageUrl.split('.');
+      const extension = urlParts[urlParts.length - 1]
+
+      const key = `random generate.${extension}`
+      //const response = await Storage.put('')
+    } catch (error) {
+      
+    }
+  }
  
   const onPostTweet = async () => {
+    await uploadImage();
+    return;
   
     try {
       const currentUser = await Auth.currentAuthenticatedUser( {bypassCache: true} );
@@ -54,12 +98,10 @@ export default function NewTweetScreen() {
               style={styles.tweetInput}
               placeholder={"What's happening?"}
             />
-            <TextInput 
-              value={imageUrl}
-              onChangeText= {value => setImageUrl(value)}
-              style={styles.imageInput}
-              placeholder={"Image url (optional)"}
-            />
+            <TouchableOpacity onPress={pickImage}>
+              <Text style={styles.pickImage}>Pick an Image</Text>
+            </TouchableOpacity>
+            <Image source={{ uri: imageUrl }} style={styles.image} />
         </View>
       </View>
     </SafeAreaView>
@@ -101,7 +143,12 @@ const styles = StyleSheet.create({
     maxHeight: 300,
     fontSize: 20,
   },
-  imageInput: {
-    
+  pickImage: {
+    fontSize:18,
+    color: Colors.light.tint
   },
+  image: {
+    width: 150,
+    height: 150,
+  }
 });
