@@ -79,6 +79,13 @@ export const createTweet = /* GraphQL */ `
         updatedAt
       }
       likes {
+        items {
+          id
+          userID
+          tweetID
+          createdAt
+          updatedAt
+        }
         nextToken
       }
       createdAt
@@ -106,6 +113,13 @@ export const updateTweet = /* GraphQL */ `
         updatedAt
       }
       likes {
+        items {
+          id
+          userID
+          tweetID
+          createdAt
+          updatedAt
+        }
         nextToken
       }
       createdAt
@@ -133,6 +147,13 @@ export const deleteTweet = /* GraphQL */ `
         updatedAt
       }
       likes {
+        items {
+          id
+          userID
+          tweetID
+          createdAt
+          updatedAt
+        }
         nextToken
       }
       createdAt
@@ -163,6 +184,18 @@ export const createLike = /* GraphQL */ `
         content
         image
         userID
+        user {
+          id
+          username
+          name
+          email
+          image
+          createdAt
+          updatedAt
+        }
+        likes {
+          nextToken
+        }
         createdAt
         updatedAt
       }
@@ -225,6 +258,18 @@ export const deleteLike = /* GraphQL */ `
         content
         image
         userID
+        user {
+          id
+          username
+          name
+          email
+          image
+          createdAt
+          updatedAt
+        }
+        likes {
+          nextToken
+        }
         createdAt
         updatedAt
       }

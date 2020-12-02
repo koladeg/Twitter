@@ -3,21 +3,31 @@ import React, { useEffect } from 'react';
 import { Image, Platform, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { API, graphqlOperation, Auth, Storage } from "aws-amplify";
 import * as ImagePicker from 'expo-image-picker';
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from 'uuid';
+
+
 import ProfilePicture from '../components/ProfilePicture';
 import { View } from '../components/Themed';
 import Colors from '../constants/Colors';
 import { createTweet } from "../graphql/mutations";
 import { useNavigation } from '@react-navigation/native';
+import { getUser } from "../graphql/queries";
 
 
 export default function NewTweetScreen() {
 
   const[tweet,  setTweet] = React.useState("");
   const[imageUrl,  setImageUrl] = React.useState("");
+  const [user, setUser] = React.useState(null)
 
   const navigation = useNavigation();
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await API.graphql(graphqlOperation(getUser, { id: userInfo.attributes.sub }))
+      setUser(currentUser.data.getUser);
+    }
     (async () => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
@@ -26,6 +36,7 @@ export default function NewTweetScreen() {
         }
       }
     })();
+    fetchUser();
   }, []);
 
   const pickImage = async () => {
@@ -36,7 +47,7 @@ export default function NewTweetScreen() {
       quality: 1,
     });
 
-    console.log(result);
+    
 
     if (!result.cancelled) {
       setImageUrl(result.uri);
@@ -52,22 +63,32 @@ export default function NewTweetScreen() {
       const urlParts = imageUrl.split('.');
       const extension = urlParts[urlParts.length - 1]
 
-      const key = `random generate.${extension}`
-      //const response = await Storage.put('')
+      
+
+      const key = `${uuidv4()}.${extension}`
+
+      await Storage.put(key, blob)
+    
+      return key;
+
     } catch (error) {
+      console.log(error);
       
     }
   }
  
   const onPostTweet = async () => {
-    await uploadImage();
-    return;
-  
+    let image;
+    if(!!imageUrl) {
+      image = await uploadImage();
+    }
+
     try {
       const currentUser = await Auth.currentAuthenticatedUser( {bypassCache: true} );
+
       const newTweet = {
         content: tweet,
-        image: imageUrl,
+        image,
         userID: currentUser.attributes.sub,
       }
       await API.graphql(graphqlOperation(createTweet, {input: newTweet}));
@@ -88,7 +109,7 @@ export default function NewTweetScreen() {
           </TouchableOpacity>
       </View>
       <View style={styles.newTweetContainer}>
-        <ProfilePicture image={'https://assets.paystack.com/assets/img/content/Collect-Payments-for-Multiple-Channels-1.1.gif'}/>
+        <ProfilePicture image={ user?.image}  size={40}/>
         <View style={styles.inputsContainer}>
             <TextInput 
               value={tweet}
