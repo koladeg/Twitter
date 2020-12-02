@@ -24,11 +24,14 @@ export default function NewTweetScreen() {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchUser = async () => {
+
+    (async () => {
+      const userInfo = await Auth.currentAuthenticatedUser({ bypassCache: true})
+      
       const currentUser = await API.graphql(graphqlOperation(getUser, { id: userInfo.attributes.sub }))
       setUser(currentUser.data.getUser);
-    }
-    (async () => {
+      console.log(user);
+
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
         if (status !== 'granted') {
@@ -36,7 +39,7 @@ export default function NewTweetScreen() {
         }
       }
     })();
-    fetchUser();
+  
   }, []);
 
   const pickImage = async () => {
@@ -109,7 +112,7 @@ export default function NewTweetScreen() {
           </TouchableOpacity>
       </View>
       <View style={styles.newTweetContainer}>
-        <ProfilePicture image={ user?.image}  size={40}/>
+        <ProfilePicture image={ user?.image}/>
         <View style={styles.inputsContainer}>
             <TextInput 
               value={tweet}
